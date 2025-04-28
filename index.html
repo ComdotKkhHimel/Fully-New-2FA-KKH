@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComDotKKH - 2FA Code Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 3px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+        }
+        
+        .header {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .subheader {
+            color: var(--secondary);
+            margin-bottom: 30px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 15px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+            color: var(--dark);
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(142, 68, 173, 0.2);
+            outline: none;
+            background-color: white;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        button {
+            flex: 1;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        #clear-btn {
+            background-color: var(--accent);
+        }
+        
+        #clear-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+        }
+        
+        .code-display {
+            font-size: 42px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            color: var(--dark);
+            margin: 25px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            border-radius: 15px;
+            display: inline-block;
+            min-width: 240px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--primary);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .code-display::before {
+            content: 'Click to Copy';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 5px;
+            background: var(--primary);
+            color: white;
+            font-size: 12px;
+            font-weight: normal;
+            letter-spacing: normal;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            opacity: 0.9;
+        }
+        
+        .code-display:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .code-display:hover::before {
+            transform: translateY(0);
+        }
+        
+        .code-display.copied {
+            background: linear-gradient(135deg, #a1ffce 0%, #faffd1 100%);
+            animation: pulse 0.5s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .timer-container {
+            height: 8px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+            display: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            width: 100%;
+            transition: width 1s linear;
+            border-radius: 4px;
+        }
+        
+        .time-left {
+            font-size: 14px;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            text-align: left;
+            font-size: 14px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .instructions h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .instructions ol {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .error {
+            color: var(--accent);
+            margin: 15px 0;
+            font-weight: 600;
+            min-height: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .code-display {
+                font-size: 32px;
+                padding: 20px;
+                min-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">ComDotKKH</div>
+        <h1 class="header">2FA Code Generator</h1>
+        <div class="subheader">Secure Time-Based Authentication Codes</div>
+        
+        <div class="input-group">
+            <label for="secret-key">Enter your 2FA Secret Key:</label>
+            <input type="text" id="secret-key" placeholder="e.g., JBSWY3DPEHPK3PXP">
+        </div>
+        
+        <div class="button-group">
+            <button id="clear-btn">Clear Key</button>
+        </div>
+        
+        <div id="error-message" class="error"></div>
+        
+        <div id="code-display" class="code-display">------</div>
+        
+        <div class="timer-container" id="timer-container">
+            <div id="timer-bar" class="timer-bar"></div>
+        </div>
+        <div id="time-left" class="time-left"></div>
+        
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <ol>
+                <li>Enter your 2FA secret key</li>
+                <li>The timer starts immediately from 30 seconds when you input</li>
+                <li>Click on the code to copy it</li>
+                <li>Codes automatically refresh when timer expires</li>
+                <li>Keep your secret key secure</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Base32 characters
+        const base32chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+        let timerInterval;
+        let currentSecret = '';
+        let inputTime = 0; // Timestamp when key was entered
+        
+        // Simplified HMAC-based OTP algorithm
+        async function generateOTP(secret, counter) {
+            // Clean the secret key
+            let cleanedSecret = secret.replace(/\s+/g, '').toUpperCase();
+            cleanedSecret = cleanedSecret.replace(/[^A-Z2-7]/g, '');
+            
+            // Convert base32 to bytes
+            let bits = '';
+            for (let i = 0; i < cleanedSecret.length; i++) {
+                const val = base32chars.indexOf(cleanedSecret[i]);
+                if (val === -1) continue;
+                bits += val.toString(2).padStart(5, '0');
+            }
+            
+            // Pad with zeros to make length multiple of 8
+            while (bits.length % 8 !== 0) {
+                bits += '0';
+            }
+            
+            // Convert binary string to byte array
+            const byteCount = bits.length / 8;
+            const bytes = new Uint8Array(byteCount);
+            for (let i = 0; i < byteCount; i++) {
+                bytes[i] = parseInt(bits.substr(i * 8, 8), 2);
+            }
+            
+            try {
+                // Prepare counter (8 bytes big-endian)
+                const counterBytes = new Uint8Array(8);
+                for (let i = 7; i >= 0; i--) {
+                    counterBytes[i] = counter & 0xff;
+                    counter = counter >>> 8;
+                }
+                
+                // Import key
+                const key = await window.crypto.subtle.importKey(
+                    'raw',
+                    bytes,
+                    { name: 'HMAC', hash: 'SHA-1' },
+                    false,
+                    ['sign']
+                );
+                
+                // Sign the counter
+                const hmac = await window.crypto.subtle.sign('HMAC', key, counterBytes);
+                const hmacBytes = new Uint8Array(hmac);
+                
+                // Dynamic truncation
+                const offset = hmacBytes[hmacBytes.length - 1] & 0xf;
+                const binCode = (
+                    ((hmacBytes[offset] & 0x7f) << 24) |
+                    ((hmacBytes[offset + 1] & 0xff) << 16) |
+                    ((hmacBytes[offset + 2] & 0xff) << 8) |
+                    (hmacBytes[offset + 3] & 0xff)
+                );
+                
+                // Get 6-digit code
+                const otp = binCode % 1000000;
+                return otp.toString().padStart(6, '0');
+            } catch (error) {
+                console.error('Error generating OTP:', error);
+                throw error;
+            }
+        }
+        
+        // Generate TOTP code (time-based)
+        async function generateTOTP(secret) {
+            try {
+                const epoch = Math.floor(Date.now() / 1000);
+                const timeStep = 30; // 30-second time steps
+                const counter = Math.floor(epoch / timeStep);
+                return await generateOTP(secret, counter);
+            } catch (error) {
+                console.error('Error generating TOTP:', error);
+                throw error;
+            }
+        }
+        
+        // Update the timer display
+        function updateTimer() {
+            const now = Date.now();
+            const elapsedSeconds = Math.floor((now - inputTime) / 1000);
+            const timeLeft = Math.max(0, 30 - (elapsedSeconds % 30));
+            const percentage = (timeLeft / 30) * 100;
+            
+            document.getElementById('timer-bar').style.width = `${percentage}%`;
+            document.getElementById('time-left').textContent = `${timeLeft}s remaining`;
+            
+            // Change timer color when time is running low
+            if (timeLeft < 10) {
+                document.getElementById('timer-bar').style.background = 
+                    `linear-gradient(90deg, var(--accent) 0%, var(--warning) 100%)`;
+            } else {
+                document.getElementById('timer-bar').style.background = 
+                    `linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%)`;
+            }
+            
+            // Generate new code if timer expired
+            if (timeLeft <= 1) {
+                generateAndDisplayCode(currentSecret);
+            }
+        }
+        
+        // Start the timer and code generation
+        function startTimerAndGeneration(secret) {
+            // Record the exact time of input
+            inputTime = Date.now();
+            
+            // Show the timer and time left
+            document.getElementById('timer-container').style.display = 'block';
+            document.getElementById('time-left').style.display = 'block';
+            
+            // Generate code immediately
+            generateAndDisplayCode(secret);
+            
+            // Update every second
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        // Stop the timer
+        function stopTimer() {
+            clearInterval(timerInterval);
+            document.getElementById('timer-container').style.display = 'none';
+            document.getElementById('time-left').style.display = 'none';
+            document.getElementById('code-display').textContent = '------';
+        }
+        
+        // Generate and display code
+        async function generateAndDisplayCode(secret) {
+            try {
+                const code = await generateTOTP(secret);
+                document.getElementById('code-display').textContent = code;
+                document.getElementById('error-message').textContent = '';
+            } catch (error) {
+                console.error(error);
+                document.getElementById('error-message').textContent = 'Invalid secret key format';
+                stopTimer();
+            }
+        }
+        
+        // Copy code to clipboard
+        function copyCode() {
+            const codeDisplay = document.getElementById('code-display');
+            if (codeDisplay.textContent !== '------') {
+                navigator.clipboard.writeText(codeDisplay.textContent)
+                    .then(() => {
+                        codeDisplay.classList.add('copied');
+                        setTimeout(() => {
+                            codeDisplay.classList.remove('copied');
+                        }, 1000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                        document.getElementById('error-message').textContent = 'Failed to copy code';
+                    });
+            }
+        }
+        
+        // DOM elements
+        const secretKeyInput = document.getElementById('secret-key');
+        const clearBtn = document.getElementById('clear-btn');
+        const codeDisplay = document.getElementById('code-display');
+        const errorMessage = document.getElementById('error-message');
+        
+        // Generate code whenever secret key changes
+        secretKeyInput.addEventListener('input', async function() {
+            const secret = secretKeyInput.value.trim();
+            
+            // Clear previous timer if exists
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            if (!secret) {
+                stopTimer();
+                errorMessage.textContent = '';
+                return;
+            }
+            
+            // Store current secret
+            currentSecret = secret;
+            
+            // Start new timer based on input time
+            startTimerAndGeneration(secret);
+        });
+        
+        // Clear button handler
+        clearBtn.addEventListener('click', function() {
+            secretKeyInput.value = '';
+            stopTimer();
+            errorMessage.textContent = '';
+        });
+        
+        // Click to copy functionality
+        codeDisplay.addEventListener('click', copyCode);
+        
+        // Initialize with timer hidden
+        stopTimer();
+    </script>
+</body>
+</html>
